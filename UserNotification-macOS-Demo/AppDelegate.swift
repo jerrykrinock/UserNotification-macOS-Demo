@@ -20,7 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         let unc = UNUserNotificationCenter.current()
-        unc.requestAuthorization(options:[UNAuthorizationOptions.alert],
+        unc.requestAuthorization(options:[UNAuthorizationOptions.alert,
+                                          UNAuthorizationOptions.sound],
                                  completionHandler: { granted, error in
                                     print(String(format: "auth granted = %hhd", granted))
                                     if let error = error {
