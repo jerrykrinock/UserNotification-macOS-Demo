@@ -10,6 +10,7 @@
 		48163E18244B82FC00E415B2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48163E17244B82FC00E415B2 /* AppDelegate.swift */; };
 		48163E1A244B82FE00E415B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48163E19244B82FE00E415B2 /* Assets.xcassets */; };
 		48163E1D244B82FE00E415B2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 48163E1B244B82FE00E415B2 /* MainMenu.xib */; };
+		48813DAA245F0A4700F0166C /* MyCustomDemoAlertSound.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 48813DA9245F0A4700F0166C /* MyCustomDemoAlertSound.aiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		48163E1C244B82FE00E415B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		48163E1E244B82FE00E415B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		48163E1F244B82FE00E415B2 /* JunkAppSwift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = JunkAppSwift.entitlements; sourceTree = "<group>"; };
+		48813DA9245F0A4700F0166C /* MyCustomDemoAlertSound.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = MyCustomDemoAlertSound.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 				48163E17244B82FC00E415B2 /* AppDelegate.swift */,
 				48163E19244B82FE00E415B2 /* Assets.xcassets */,
 				48163E1B244B82FE00E415B2 /* MainMenu.xib */,
+				48813DA9245F0A4700F0166C /* MyCustomDemoAlertSound.aiff */,
 				48163E1E244B82FE00E415B2 /* Info.plist */,
 				48163E1F244B82FE00E415B2 /* JunkAppSwift.entitlements */,
 			);
@@ -120,6 +123,7 @@
 			files = (
 				48163E1A244B82FE00E415B2 /* Assets.xcassets in Resources */,
 				48163E1D244B82FE00E415B2 /* MainMenu.xib in Resources */,
+				48813DAA245F0A4700F0166C /* MyCustomDemoAlertSound.aiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

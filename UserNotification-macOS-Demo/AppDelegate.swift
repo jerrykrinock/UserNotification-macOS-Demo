@@ -41,7 +41,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let uuidString = UUID.init().uuidString
         content.title = title
         content.body = "Posted at " + (Date().description)
-        content.sound = UNNotificationSound.default
+        
+        /* See Apple documentation UserNotifications > UNNotificationSound
+         for requirements and search paths applied to custom sound files. */
+        let soundName = UNNotificationSoundName.init("MyCustomDemoAlertSound")
+        /* In the Objective-C equivalent, soundName is simply a NSString. */
+        let sound = UNNotificationSound.init(named:soundName)
+        content.sound = sound
+        
+        /* Using the system's default sound instead would be simply */
+        // content.sound = UNNotificationSound.default
+        
         let request = UNNotificationRequest(identifier: uuidString , content: content, trigger: nil)
         let unc = UNUserNotificationCenter.current()
         unc.add(request, withCompletionHandler: { error in
