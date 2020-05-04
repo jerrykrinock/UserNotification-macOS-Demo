@@ -4,8 +4,18 @@ import UserNotifications
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     
-    @IBOutlet private weak var window: NSWindow!
+    func dateFormatter() -> DateFormatter {
+        let dateFormatter = DateFormatter.init()
+        dateFormatter.dateFormat = "HH:mm:ss"
+        return dateFormatter;
+    }
     
+    @IBOutlet private weak var window: NSWindow!
+    @IBOutlet private var titleField: NSTextField!
+    @IBOutlet private var subtitleField: NSTextField!
+    @IBOutlet private var bodyField: NSTextField!
+    @IBOutlet private var soundCheckbox: NSButton!
+
     /* In documentation of UNUserNotificationCenterDelegate > Overview >
      Important, Apple states that "You must assign your delegate object to the
      UNUserNotificationCenter object before your app finishes launching".
@@ -28,29 +38,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                                         print("auth error = \(error)")
                                     }
         })
-        postNow(withTitle: "Demo app has launched")
     }
     
-    @IBAction func notifyMe(_ sender: Any) {
-        postNow(withTitle: "Button clicked")
-    }
-    
-    func postNow(withTitle title: String!) {
+    @IBAction func addNotification(_sender:NSButton) {
         let content = UNMutableNotificationContent()
-        content.subtitle = "You can put a Subtitle here"
+        content.title = titleField.stringValue
+        content.subtitle = subtitleField.stringValue
+        if (bodyField.stringValue.lengthOfBytes(using:String.Encoding.utf8) > 0) {
+            let dateString = self.dateFormatter().string(from: Date())
+            content.body = bodyField.stringValue + " [" + (dateString + "]")
+        }
         let uuidString = UUID.init().uuidString
-        content.title = title
-        content.body = "Posted at " + (Date().description)
         
-        /* See Apple documentation UserNotifications > UNNotificationSound
-         for requirements and search paths applied to custom sound files. */
-        let soundName = UNNotificationSoundName.init("MyCustomDemoAlertSound")
-        /* In the Objective-C equivalent, soundName is simply a NSString. */
-        let sound = UNNotificationSound.init(named:soundName)
-        content.sound = sound
-        
-        /* Using the system's default sound instead would be simply */
-        // content.sound = UNNotificationSound.default
+        if (soundCheckbox.state == NSControl.StateValue.on) {
+            /* See Apple documentation UserNotifications > UNNotificationSound
+             for requirements and search paths applied to custom sound files. */
+            let soundName = UNNotificationSoundName.init("MyCustomDemoAlertSound")
+            /* In the Objective-C equivalent, soundName is simply a NSString. */
+            let sound = UNNotificationSound.init(named:soundName)
+            content.sound = sound
+            
+            /* Using the system's default sound instead would be simply */
+            // content.sound = UNNotificationSound.default
+        }
         
         let request = UNNotificationRequest(identifier: uuidString , content: content, trigger: nil)
         let unc = UNUserNotificationCenter.current()
