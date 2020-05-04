@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     @IBOutlet private var subtitleField: NSTextField!
     @IBOutlet private var bodyField: NSTextField!
     @IBOutlet private var soundCheckbox: NSButton!
+    @IBOutlet private var actionsTextField: NSTextField!
 
     /* In documentation of UNUserNotificationCenterDelegate > Overview >
      Important, Apple states that "You must assign your delegate object to the
@@ -44,8 +45,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let content = UNMutableNotificationContent()
         content.title = titleField.stringValue
         content.subtitle = subtitleField.stringValue
+        let dateString = self.dateFormatter().string(from: Date())
         if (bodyField.stringValue.lengthOfBytes(using:String.Encoding.utf8) > 0) {
-            let dateString = self.dateFormatter().string(from: Date())
             content.body = bodyField.stringValue + " [" + (dateString + "]")
         }
         let uuidString = UUID.init().uuidString
@@ -62,8 +63,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             // content.sound = UNNotificationSound.default
         }
         
-        let request = UNNotificationRequest(identifier: uuidString , content: content, trigger: nil)
+        content.categoryIdentifier = "MY_CATEGORY";
+        content.userInfo = [
+            "MY_TIMESTAMP" : dateString
+        ]
+        
+        var actions = Array<UNNotificationAction>()
+        if (actionsTextField.integerValue > 0) {
+            for index in 1...actionsTextField.integerValue {
+                let identifier = "ACTION_\(index)"
+                let title = "Action \(index)"
+                let action = UNNotificationAction(identifier: identifier,
+                                                  title: title,
+                                                  options: UNNotificationActionOptions(rawValue: 0))
+                actions.append(action)
+            }
+        }
+        
         let unc = UNUserNotificationCenter.current()
+
+        /* This section is not necessary on the first run if number of actions
+         is 0, because categories are empty by default.  But setting the
+         categories to an empty array is necessary if the number of actions
+         is being reduced from nonzero to zero, because Notification Center
+         remembers your categories from the prior run of this app.*/
+        let myCategory = UNNotificationCategory(identifier: "MY_CATEGORY",
+                                                actions: actions,
+                                                intentIdentifiers: [],
+                                                hiddenPreviewsBodyPlaceholder: "",
+                                                options: .customDismissAction)
+        unc.setNotificationCategories([myCategory])
+        
+        let request = UNNotificationRequest(identifier: uuidString , content: content, trigger: nil)
         unc.add(request, withCompletionHandler: { error in
             if let error = error {
                 print("error: \(error)")
@@ -83,5 +114,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         print("We must be the active app – handling delegate callback")
         completionHandler(UNNotificationPresentationOptions.alert)
     }
+    
+    /* This method must be implememnted or the buttons will not show on
+     your alert.  That is, it will be a banner instead of an alert.  If
+     you are only showing banners, you do not need this method. */
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler:
+        @escaping () -> Void) {
+        
+        let userInfo = response.notification.request.content.userInfo
+        let timestamp = userInfo["MY_TIMESTAMP"] as! String
+        
+        // Perform the task associated with the action.
+        let actionIdentifier = response.actionIdentifier
+        if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
+            print("Received DEFAULT action for notification added at \(timestamp)")
+        } else if (actionIdentifier == UNNotificationDismissActionIdentifier) {
+            print("Received DISMISS action for notification added at \(timestamp).  Typically, this happens because your user clicked the 'Close' button in the notification bubble.")
+        } else {
+            print("Received action \(actionIdentifier as String) for notification added at \(timestamp)")
+        }
+        
+        // Always call the completion handler when done.
+        completionHandler()
+    }
+
 }
 
