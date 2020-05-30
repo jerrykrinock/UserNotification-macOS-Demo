@@ -86,10 +86,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
          is 0, because categories are empty by default.  But setting the
          categories to an empty array is necessary if the number of actions
          is being reduced from nonzero to zero, because Notification Center
-         remembers your categories from the prior run of this app.*/
+         remembers your categories from the prior run of this app.
+         
+         Also, the .customDismissAction is necessary if you want
+         .userNotificationCenter(_:didReceive:withCompletionHandler:) to be
+         called, sending you the UNNotificationDismissActionIdentifier
+         action, when your user clicks the 'Close' button in a banner or alert,
+         or clicks in the non-button area of an alert.
+         */
         let myCategory = UNNotificationCategory(identifier: "MY_CATEGORY",
                                                 actions: actions,
-                                                intentIdentifiers: [],
+                                                intentIdentifiers: [],  // these would be for Siri
                                                 hiddenPreviewsBodyPlaceholder: "",
                                                 options: .customDismissAction)
         unc.setNotificationCategories([myCategory])
@@ -105,7 +112,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     /* The following implementation (from UNUserNotificationCenterDelegate) is
      necessary in order for the notification alert to display when we are the
      active application.  No thanks to Apple for hiding this fact way down in
-     Local and Remote Notificaiton Programming Guide
+     Local and Remote Notification Programming Guide
      > Notifications in Your App > Scheduling and Handling Notifications >
      Handling Notifications When Your App Is in the Foreground. */
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -129,9 +136,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Perform the task associated with the action.
         let actionIdentifier = response.actionIdentifier
         if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
-            print("Received DEFAULT action for notification added at \(timestamp)")
+            print("Received DEFAULT action for notification added at \(timestamp).  This happens when your user clicks in the body of a banner or alert, which causes the banner or alert to be dismissed, without clicking any of its buttons.")
         } else if (actionIdentifier == UNNotificationDismissActionIdentifier) {
-            print("Received DISMISS action for notification added at \(timestamp).  Typically, this happens because your user clicked the 'Close' button in the notification bubble.")
+            print("Received DISMISS action for notification added at \(timestamp).  This happens When your user clicks the 'Close' button in a banner or alert, or clicks in the non-button area of an alert.")
         } else {
             print("Received action \(actionIdentifier as String) for notification added at \(timestamp)")
         }
@@ -139,6 +146,4 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Always call the completion handler when done.
         completionHandler()
     }
-
 }
-
