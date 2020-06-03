@@ -98,6 +98,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             "MY_TIMESTAMP" : dateString
         ]
         
+        /* Now add the "actions* which will appear as a button if you add 1
+         action, or a menu if you add more than 1 action, in your notification,
+         provided that the user has set in System Preferences > Notifications
+         your app to display "Alerts".  If user has downgraded your app to
+         present only "Banners", then no custom button nor menu will appear.
+         In other words, there is no way to guarantee that the following code
+         will have any effect! */
         var actions = Array<UNNotificationAction>()
         if (actionsTextField.integerValue > 0) {
             for index in 1...actionsTextField.integerValue {
@@ -154,7 +161,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     /* This method must be implememnted or the buttons will not show on
      your alert.  That is, it will be a banner instead of an alert.  If
-     you are only showing banners, you do not need this method. */
+     you are only showing banners, you do not need this method.
+     
+     Note that if your alert is presented as a banner and the user never
+     clicks on it, this function will not be called.  Also, if you manually
+     remove your delivered notification from Notification Center by calling
+     UNUserNotificationCenter.removeDeliveredNotifications(withIdentifiers:),
+     this function will not be called. */
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler:
