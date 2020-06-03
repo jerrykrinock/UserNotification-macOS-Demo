@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     @IBOutlet private var bodyField: NSTextField!
     @IBOutlet private var soundCheckbox: NSButton!
     @IBOutlet private var actionsTextField: NSTextField!
+    @IBOutlet private var olderThanTextField: NSTextField!
 
     /* In documentation of UNUserNotificationCenterDelegate > Overview >
      Important, Apple states that "You must assign your delegate object to the
@@ -41,6 +42,35 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         })
     }
     
+    @IBAction func visitSystemPreferences(_sender: NSButton) {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications")
+        if let url = url {
+            NSWorkspace.shared.open(url)
+        }
+    }
+    
+    @IBAction func removeStaleDeliveredNotificationsOlderThan(_sender: NSButton) {
+        let unc = UNUserNotificationCenter.current()
+        unc.getDeliveredNotifications(completionHandler: { notifications in
+            print("Found \(notifications.count) delivered notifications still in Notification Center")
+            var doomedNotificationIdentifiers : [String] = []
+            /* We are likely on a secondary thread here must switch to main
+             to read a value from user interface. */
+            var olderThanSeconds: Double = 0.0
+            DispatchQueue.main.sync {
+                olderThanSeconds = 60 * Double(self.olderThanTextField.integerValue)
+            }
+            
+            for aNotification in notifications {
+                if (aNotification.date < Date().addingTimeInterval(-olderThanSeconds)) {
+                    doomedNotificationIdentifiers.append(aNotification.request.identifier)
+                }
+            }
+            print("Removing \(doomedNotificationIdentifiers.count) stale delivered notifications.")
+            unc.removeDeliveredNotifications(withIdentifiers: doomedNotificationIdentifiers)
+        })
+    }
+
     @IBAction func addNotification(_sender:NSButton) {
         let content = UNMutableNotificationContent()
         content.title = titleField.stringValue
@@ -136,7 +166,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Perform the task associated with the action.
         let actionIdentifier = response.actionIdentifier
         if (actionIdentifier == UNNotificationDefaultActionIdentifier) {
-            print("Received DEFAULT action for notification added at \(timestamp).  This happens when your user clicks in the body of a banner or alert, which causes the banner or alert to be dismissed, without clicking any of its buttons.")
+            print("Received DEFAULT action for notification added at \(timestamp).  This happens when your user clicks in the body of a banner or alert, which causes the banner or alert to be dismissed, without clicking any of its buttons.  Note: User can click either on the banner, while it is visible on the desktop, or on the notification *in* Notification Center.")
         } else if (actionIdentifier == UNNotificationDismissActionIdentifier) {
             print("Received DISMISS action for notification added at \(timestamp).  This happens When your user clicks the 'Close' button in a banner or alert, or clicks in the non-button area of an alert.")
         } else {
